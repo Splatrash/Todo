@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">Todo</string>
+    <string name="title_home">Tâches</string>
+    <string name="title_dashboard">À faire</string>
+    <string name="edit_tache_menu">Modifier</string>
+    <string name="delete_tache_menu">Supprimer</string>
+    <string name="hint_popup_tache_titre">Titre</string>
+    <string name="hint_popup_tache_description">Description</string>
+    <string name="btn_popup_tache_ajouter">Ajouter</string>
+    <string name="btn_popup_tache_modifier">Modifier</string>
+    <string name="btn_popup_tache_annuler">Annuler</string>
+    <string name="tv_popup_ajouter">Ajouter une tâche</string>
+    <string name="tv_popup_modifier">Modifier une tâche</string>
+
+</resources>
