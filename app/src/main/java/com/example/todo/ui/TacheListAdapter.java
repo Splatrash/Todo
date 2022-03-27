@@ -1,18 +1,20 @@
 package com.example.todo.ui;
 
+import android.content.Context;
+
 import android.util.Log;
+
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
-import android.widget.AdapterView;
+
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.helper.widget.Carousel;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
@@ -28,13 +30,15 @@ public class TacheListAdapter extends RecyclerView.Adapter<TacheListAdapter.Tach
     private List<Tache> tachesList;
     private TacheDatabase mDb;
 
-    private OnMenuItemClickListener mListener;
+    private onMenuItemClickListener mListener;
 
-    public interface OnMenuItemClickListener {
+    private Context mContext;
+
+    public interface onMenuItemClickListener {
         void onContextMenuModifierClick(int position);
     }
 
-    public void setOnMenuItemClickListener(OnMenuItemClickListener listener) {
+    public void setOnMenuItemClickListener(onMenuItemClickListener listener) {
         this.mListener = listener;
     }
 
@@ -54,7 +58,6 @@ public class TacheListAdapter extends RecyclerView.Adapter<TacheListAdapter.Tach
         tacheViewHolder.tvTitre.setText(current.getTitre());
         tacheViewHolder.tvDescription.setText(current.getDescription());
 
-
         int[] icon_ressource_number = {R.drawable.icon1, R.drawable.icon2,
                 R.drawable.icon3, R.drawable.icon4, R.drawable.icon5};
         tacheViewHolder.imgTache.setImageResource(icon_ressource_number[current.getNum_image()]);
@@ -69,7 +72,7 @@ public class TacheListAdapter extends RecyclerView.Adapter<TacheListAdapter.Tach
                         Log.d("TAG", "onBindViewHolder: " + current.getId());
 
                         // A revoir, car enlè
-                        mDb.todoDao().setIfChosen(current.getTitre(), true);
+                        mDb.todoDao().setIfChosen(current.getId(), true);
 
                     }
                 });
@@ -90,7 +93,7 @@ public class TacheListAdapter extends RecyclerView.Adapter<TacheListAdapter.Tach
                 else
                     contextMenu.hasVisibleItems();
 
-
+                //Lorsque l'option modifier du menu contextuel est sélectionnée
                 modifier.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
@@ -100,19 +103,16 @@ public class TacheListAdapter extends RecyclerView.Adapter<TacheListAdapter.Tach
 
                                 //Faire la gestion de la modification d'une tâche ici
 
-
-                                String titre =  current.getTitre();
-                                String description =  current.getDescription();
-                                int id = current.getId();
+                                Tache tacheModifier = current;
 
                                 //mDb.todoDao().updateTache();
-
                             }
                         });
                         return false;
                     }
                 });
 
+                //Lorsque l'option supprimer du menu contextuel est sélectionnée
                 supprimer.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem menuItem) {
@@ -128,7 +128,6 @@ public class TacheListAdapter extends RecyclerView.Adapter<TacheListAdapter.Tach
                 });
             }
         });
-
     }
 
     public void setTaches(List<Tache> taches) {
@@ -149,28 +148,12 @@ public class TacheListAdapter extends RecyclerView.Adapter<TacheListAdapter.Tach
     public class TacheViewHolder extends RecyclerView.ViewHolder {
         public TextView tvTitre, tvDescription, tvId;
         ImageView imgTache;
-
-        public TacheViewHolder(@NonNull View itemView, OnMenuItemClickListener mListener) {
+        public TacheViewHolder(@NonNull View itemView, final onMenuItemClickListener listener) {
             super(itemView);
             tvId = itemView.findViewById(R.id.tv_id);
             tvTitre = itemView.findViewById(R.id.tv_titre);
             tvDescription = itemView.findViewById(R.id.tv_description);
             imgTache = itemView.findViewById(R.id.img_tache);
-
-/*            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        // Bonne pratique pour s'assurer que l'élément clické est toujours présent
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
-                    }
-                }
-            }); */
         }
-
     }
-
 }

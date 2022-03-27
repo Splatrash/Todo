@@ -37,6 +37,7 @@ public abstract class TacheDatabase extends RoomDatabase {
         return INSTANCE;
     }
 
+    //Ajout de trois tâches à la première utilisation de l'app.
     private static final RoomDatabase.Callback sRoomDatabaseCallback =
             new RoomDatabase.Callback() {
                 @Override

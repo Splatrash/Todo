@@ -1,13 +1,16 @@
 package com.example.todo.ui;
 
 import android.util.Log;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.todo.R;
@@ -53,7 +56,7 @@ public class TacheChoisieListAdapter extends RecyclerView.Adapter<TacheChoisieLi
                         Log.d("TAG", "onBindViewHolder: " + current.getId());
 
                         // A revoir, car enlè
-                        mDb.todoDao().setIfChosen(current.getTitre(), false);
+                        mDb.todoDao().setIfChosen(current.getId(), false);
 
                     }
                 });
@@ -82,20 +85,6 @@ public class TacheChoisieListAdapter extends RecyclerView.Adapter<TacheChoisieLi
             tvTitre = itemView.findViewById(R.id.tv_titre);
             tvDescription = itemView.findViewById(R.id.tv_description);
             imgTache = itemView.findViewById(R.id.img_tache);
-
-/*            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (listener != null) {
-                        int position = getAdapterPosition();
-                        // Bonne pratique pour s'assurer que l'élément clické est toujours présent
-                        if (position != RecyclerView.NO_POSITION) {
-                            listener.onItemClick(position);
-                        }
-                    }
-                }
-            }); */
         }
-
     }
 }

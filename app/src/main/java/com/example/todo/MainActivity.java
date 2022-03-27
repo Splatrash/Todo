@@ -1,39 +1,41 @@
 package com.example.todo;
 
 import android.Manifest;
+
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+
 import android.os.Bundle;
+
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+
 import android.widget.Toast;
 
 import com.example.todo.data.TacheDatabase;
 import com.example.todo.model.Tache;
 import com.example.todo.ui.home.HomeFragment;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.todo.ui.FormulaireTacheFragment;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.todo.databinding.ActivityMainBinding;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.example.todo.data.AppExecutors;
-import com.google.android.material.snackbar.Snackbar;
-import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.Random;
 
@@ -44,7 +46,10 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private TacheDatabase tachesBD;
 
+    FloatingActionButton fabAjouterTache;
+
     public static boolean isAdmin;
+    private boolean formIsUp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +58,6 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_home, R.id.navigation_dashboard)
                 .build();
@@ -63,8 +65,41 @@ public class MainActivity extends AppCompatActivity {
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 
+        fabAjouterTache = findViewById(R.id.fab_add_tache);
+
+        //Cache le bouton pour ajouter une tâche à l'ouverture
+        fabAjouterTache.hide();
+
+        //Vérifie si le formulaire d'ajout d'une tâche est déja ouvert.
+        formIsUp = false;
+
+        //Gestion clique sur le bouton ajout d'une tâche, si le formulaire est déja ouvert, réappuyer va le fermer
+        fabAjouterTache.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                formIsUp = !formIsUp;
+                if (formIsUp){
+                    FormulaireTacheFragment.formType = "ajouter";
+                    getSupportFragmentManager().beginTransaction().replace(R.id.fl_fragment_form, new FormulaireTacheFragment(), "TAG")
+                            .addToBackStack(null).commit();
+                }
+                else {
+                    closeForm();
+                }
+            }
+        });
     }
 
+    public void closeForm(){
+        formIsUp = false;
+        FormulaireTacheFragment formulaireTacheFragmentRemove = (FormulaireTacheFragment) getSupportFragmentManager()
+                .findFragmentByTag("TAG");
+        getSupportFragmentManager()
+                .beginTransaction()
+                .remove(formulaireTacheFragmentRemove)
+                .commit();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -75,25 +110,24 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
 
             case R.id.bt_admin:
+                //Demande à l'utilisateur de pouvoir accéder à la camera
                 if (ContextCompat.checkSelfPermission(MainActivity.this,
                         Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                     requestPermissions(new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_CODE);
                 }
+                //Vérifie si la persmmission a été accordé avant d'accéder aux fonction d'administrateur.
                 if (ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                     isAdmin = !isAdmin;
 
                     FloatingActionButton fabAjouterTache = findViewById(R.id.fab_add_tache);
-                    if(isAdmin){
-
+                    if(isAdmin)
                         fabAjouterTache.show();
-                    }
-                    else {
+                    else
                         fabAjouterTache.hide();
-                    }
+
                     return true;
                 }
                 else {
@@ -112,14 +146,14 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == CAMERA_PERMISSION_CODE) {
-            // If request is cancelled, the result arrays are empty.
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permission is granted. Continue the action or workflow
-                // in your app.
+
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 Toast.makeText(this, "Autorisation à la camera accordée", Toast.LENGTH_LONG).show();
-            } else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                        Manifest.permission.CAMERA)) {
+
+            else if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED)
+            {
+                if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this, Manifest.permission.CAMERA))
+                {
                     AlertDialog.Builder dialog = new AlertDialog.Builder(this);
                     dialog.setTitle("Permission requise !");
                     dialog.setMessage("La permission à la camera est requise pour pouvoir administrer les tâches disponibles!");
@@ -142,12 +176,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    //Logique de l'ajout d'une tâche avec la mise à jour de le bd
     public void AjouterUneTache(String titre, String description){
         tachesBD = TacheDatabase.getDatabase(this);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
             @Override
             public void run() {
-
                 Random r = new Random();
                 int nbrIconPossible = 5;
                 Tache tache = new Tache(titre, description, r.nextInt(nbrIconPossible), false);
@@ -156,6 +191,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Logique de la modification d'une tâche avec la mise à jour de le bd
     public void ModifierUneTache(Tache tache){
         tachesBD = TacheDatabase.getDatabase(this);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -166,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    //Logique de la suppression d'une tâche avec la mise à jour de le bd
     public void SupprimerToutesTaches(){
         tachesBD = TacheDatabase.getDatabase(this);
         AppExecutors.getInstance().diskIO().execute(new Runnable() {
@@ -174,5 +211,35 @@ public class MainActivity extends AppCompatActivity {
                 tachesBD.todoDao().deleteAllTaches();
             }
         });
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            getSupportFragmentManager().popBackStack();
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        savedInstanceState.putBoolean("isAdmin", isAdmin);
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+
+        super.onRestoreInstanceState(savedInstanceState);
+        isAdmin = savedInstanceState.getBoolean("isAdmin");
+
+        if(isAdmin){
+            fabAjouterTache.show();
+        }
+        else {
+            fabAjouterTache.hide();
+        }
+
     }
 }
